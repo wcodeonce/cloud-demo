@@ -1,0 +1,59 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: orderservice
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:80 # nacos 服务地址
+      discovery:
+        cluster-name: GD # 配置集群名称，也就是机房位置，例如 GD 广东
+  #        namespace: 993552f1-1b56-4208-aef5-06ae7694316d # 命名空间，填ID
+  #        ephemeral: false # 设置为非临时实例
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cloud_order?useSSL=false
+    username: root
+    password: admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis:
+  type-aliases-package: cn.itcast.user.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    cn.itcast: debug
+  pattern:
+    dateformat: MM-dd HH:mm:ss:SSS
+
+#eureka:
+#  client:
+#    service-url:
+#      # Eureka 服务地址信息
+#      defaultZone: http://127.0.0.1:8090/eureka/
+
+userservice:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.alibaba.cloud.nacos.ribbon.NacosRule # 负载均衡策略
+# xxxservice: # 要做配置的微服务名称
+#  ribbon:
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer # 负载均衡策略
+
+ribbon:
+  eager-load:
+    # 开启懒加载
+    enabled: true
+    # 通过userservice这个服务懒加载
+    clients:
+      - userservice
+
+feign:
+  client:
+    config:
+      default: # 这里用default就是全局配置，如果时写服务名称，这是针对某个微服务的配置
+        #userservice: # 这里用default就是全局配置，如果时写服务名称，这是针对某个微服务的配置
+        loggerLevel: basic # 日志级别
+  httpclient:
+    enabled: true # 开启feign对Httpclient的支持
+    max-connections: 200 # 最大的连接数
+    max-connections-per-route: 50 # 每个路径的最大连接数
